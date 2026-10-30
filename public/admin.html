@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Administrador | Confinanzas</title>
+<style>
+:root{
+  --amarillo:#F2B93B;--amarillo-claro:#FFF3D1;--azul:#0B1F3A;--azul-medio:#17345E;--naranja:#F26A1B;
+  --fondo:#FFFFFF;--fondo-suave:#F5F6F8;--texto:#1B2433;--texto-suave:#566074;--borde:#DDE1E8;
+  --ok:#1E9E5A;--error:#C93A2B;
+}
+@media (prefers-color-scheme:dark){:root{
+  --fondo:#0E1522;--fondo-suave:#141D2D;--texto:#EEF1F6;--texto-suave:#A9B3C5;--borde:#26324A;--amarillo-claro:#2A2412;
+}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--fondo-suave);color:var(--texto);font-family:"Nunito Sans","Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.5}
+h1,h2,h3{font-family:"Poppins","Segoe UI",Arial,sans-serif;line-height:1.2;margin:0 0 .5em}
+button,input,select,textarea{font:inherit;color:inherit}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--naranja);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;font-weight:700;border:2px solid transparent;cursor:pointer;background:var(--azul);color:#fff;text-decoration:none;min-height:44px}
+.btn:hover{filter:brightness(1.12)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.amarillo{background:var(--amarillo);color:var(--azul)}
+.btn.borde{background:transparent;border-color:var(--borde);color:var(--texto)}
+.btn.peligro{background:transparent;border-color:var(--error);color:var(--error)}
+.btn.chico{padding:6px 12px;min-height:36px;font-size:.9rem}
+@media (prefers-color-scheme:dark){.btn:not(.amarillo):not(.borde):not(.peligro){background:var(--azul-medio)}}
+
+/* ---------- Login ---------- */
+.login{min-height:100dvh;display:grid;place-items:center;padding:20px;background:var(--azul)}
+.login-caja{width:min(400px,100%);background:var(--fondo);padding:34px 30px;border-top:6px solid var(--amarillo)}
+.login-caja .marca{display:flex;align-items:center;gap:10px;margin-bottom:18px;font:800 1.15rem "Poppins",sans-serif;color:var(--azul)}
+@media (prefers-color-scheme:dark){.login-caja .marca{color:var(--amarillo)}}
+.login-caja p{color:var(--texto-suave);margin:0 0 18px}
+.campo{display:block;margin-bottom:16px}
+.campo>span{display:block;font-weight:700;margin-bottom:5px;font-size:.95rem}
+.campo small{display:block;color:var(--texto-suave);margin-top:4px}
+input[type=text],input[type=password],input[type=url],textarea,select{width:100%;padding:11px 12px;border:2px solid var(--borde);background:var(--fondo);min-height:44px}
+textarea{min-height:110px;resize:vertical}
+input:focus,textarea:focus,select:focus{border-color:var(--azul-medio);outline:none}
+.error{color:var(--error);font-weight:700;margin:0 0 14px}
+
+/* ---------- Panel ---------- */
+.barra{background:var(--azul);color:#fff;position:sticky;top:0;z-index:20}
+.barra .in{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;width:min(1000px,94%);margin:auto;flex-wrap:wrap}
+.barra .marca{display:flex;align-items:center;gap:10px;font:800 1.05rem "Poppins",sans-serif}
+.barra .marca small{display:block;font-size:.65rem;font-weight:600;letter-spacing:.05em;color:#C4CEDF}
+.barra .acc{display:flex;gap:8px}
+.barra .btn.borde{color:#fff;border-color:rgba(255,255,255,.35)}
+.principal{width:min(1000px,94%);margin:22px auto 70px}
+.tabs{display:flex;gap:6px;border-bottom:2px solid var(--borde);margin-bottom:20px;overflow-x:auto}
+.tab{flex:1 0 auto;padding:13px 18px;border:0;background:none;cursor:pointer;font-weight:800;color:var(--texto-suave);border-bottom:4px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.tab[aria-selected=true]{color:var(--texto);border-bottom-color:var(--amarillo)}
+.tab .n{display:inline-block;min-width:22px;padding:0 6px;margin-left:6px;background:var(--borde);color:var(--texto);font-size:.8rem;text-align:center;border-radius:11px}
+.cabecera{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.cabecera p{margin:0;color:var(--texto-suave);max-width:56ch}
+.lista{display:grid;gap:12px}
+.item{display:grid;grid-template-columns:96px 1fr auto;gap:16px;align-items:center;background:var(--fondo);border:1px solid var(--borde);padding:12px}
+.item.apagado{opacity:.62}
+.item .mini{width:96px;height:72px;background:var(--azul);display:grid;place-items:center;overflow:hidden;color:var(--amarillo);font-size:1.6rem}
+.item .mini img,.item .mini video{width:100%;height:100%;object-fit:cover}
+.item h3{margin:0 0 2px;font-size:1.05rem;overflow-wrap:anywhere}
+.item .meta{font-size:.88rem;color:var(--texto-suave);display:flex;gap:6px 12px;flex-wrap:wrap}
+.insignia{display:inline-block;padding:1px 9px;font-size:.78rem;font-weight:800;background:var(--amarillo-claro);color:#7A5A00;border:1px solid var(--amarillo)}
+.insignia.ok{background:#DDF5E7;color:#13693B;border-color:#8FD6AE}
+.insignia.off{background:var(--fondo-suave);color:var(--texto-suave);border-color:var(--borde)}
+@media (prefers-color-scheme:dark){.insignia{color:var(--amarillo)}.insignia.ok{background:#12301F;color:#7BE0A4;border-color:#1E6B42}}
+.item .botones{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.vacio{background:var(--fondo);border:2px dashed var(--borde);padding:44px 20px;text-align:center;color:var(--texto-suave)}
+@media (max-width:640px){
+  .item{grid-template-columns:76px 1fr}
+  .item .mini{width:76px;height:60px}
+  .item .botones{grid-column:1/-1;justify-content:flex-start}
+}
+
+/* ---------- Formulario (ventana) ---------- */
+dialog{border:0;padding:0;width:min(680px,100%);max-height:100dvh;background:var(--fondo);color:var(--texto);margin:auto}
+dialog::backdrop{background:rgba(5,9,16,.65)}
+.dlg-cab{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;background:var(--azul);color:#fff;position:sticky;top:0;z-index:2}
+.dlg-cab h2{margin:0;font-size:1.2rem}
+.dlg-cab button{background:none;border:0;color:#fff;font-size:1.8rem;cursor:pointer;line-height:1;width:40px;height:40px}
+form.cuerpo{padding:22px}
+.pie-form{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--borde);margin-top:8px}
+.fila2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:560px){.fila2{grid-template-columns:1fr}}
+.subir{border:2px dashed var(--borde);padding:14px;background:var(--fondo-suave)}
+.subir .prev{margin-bottom:10px;max-height:240px;display:grid;place-items:center;background:#000}
+.subir .prev img,.subir .prev video{max-width:100%;max-height:240px}
+.subir .fila{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.subir input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+.progreso{height:8px;background:var(--borde);margin-top:10px}
+.progreso i{display:block;height:100%;width:0;background:var(--amarillo);transition:width .15s}
+.disenos{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:560px){.disenos{grid-template-columns:repeat(2,1fr)}}
+.diseno{position:relative;border:2px solid var(--borde);background:var(--fondo);padding:8px;cursor:pointer;text-align:center;font-size:.85rem;font-weight:700}
+.diseno input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.diseno svg{display:block;width:100%;height:auto;margin-bottom:4px;color:var(--azul-medio)}
+@media (prefers-color-scheme:dark){.diseno svg{color:var(--amarillo)}}
+.diseno:has(input:checked){border-color:var(--naranja);background:var(--amarillo-claro)}
+.diseno:has(input:focus-visible){outline:3px solid var(--naranja)}
+.interruptor{display:flex;align-items:center;gap:10px;font-weight:700;cursor:pointer;margin-bottom:16px}
+.interruptor input{width:22px;height:22px;accent-color:var(--azul-medio)}
+.aviso{background:var(--amarillo-claro);border-left:5px solid var(--amarillo);padding:10px 14px;font-size:.92rem;margin-bottom:16px}
+#toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--azul);color:#fff;padding:12px 20px;font-weight:700;z-index:99;box-shadow:0 8px 26px rgba(0,0,0,.35);max-width:92vw}
+#toast.mal{background:var(--error)}
+</style>
+</head>
+<body>
+
+<!-- ============ INICIO DE SESIÓN ============ -->
+<div class="login" id="vLogin" hidden>
+  <form class="login-caja" id="fLogin" autocomplete="on">
+    <div class="marca">
+      <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="#F2B93B" stroke-width="3.5"/><rect x="12" y="27" width="5" height="9" fill="#F2B93B"/><rect x="20" y="22" width="5" height="14" fill="#F2B93B"/><rect x="28" y="17" width="5" height="19" fill="#F2B93B"/><path d="M11 24 L21 17 L27 21 L37 11" fill="none" stroke="#F2B93B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>CONFINANZAS</span>
+    </div>
+    <h1 style="font-size:1.5rem">Acceso de administrador</h1>
+    <p>Solo para quien actualiza el sitio web.</p>
+    <p class="error" id="loginError" role="alert" hidden></p>
+    <label class="campo"><span>Usuario</span><input type="text" id="lUser" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
+    <label class="campo"><span>Contraseña</span><input type="password" id="lPass" name="password" autocomplete="current-password" required></label>
+    <button class="btn amarillo" style="width:100%" id="lBtn">Entrar</button>
+    <p style="margin:18px 0 0;text-align:center"><a href="/" style="color:var(--texto-suave)">← Volver al sitio</a></p>
+  </form>
+</div>
+
+<!-- ============ PANEL ============ -->
+<div id="vPanel" hidden>
+  <div class="barra"><div class="in">
+    <div class="marca">
+      <svg width="34" height="34" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="#F2B93B" stroke-width="3.5"/><rect x="12" y="27" width="5" height="9" fill="#F2B93B"/><rect x="20" y="22" width="5" height="14" fill="#F2B93B"/><rect x="28" y="17" width="5" height="19" fill="#F2B93B"/><path d="M11 24 L21 17 L27 21 L37 11" fill="none" stroke="#F2B93B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Administrador<small>CONFINANZAS</small></span>
+    </div>
+    <div class="acc">
+      <a class="btn borde chico" href="/" target="_blank" rel="noopener">Ver sitio</a>
+      <button class="btn borde chico" id="bSalir" type="button">Salir</button>
+    </div>
+  </div></div>
+
+  <main class="principal">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="estados">Estados<span class="n" id="n-estados">0</span></button>
+      <button class="tab" role="tab" data-tab="novedades">Novedades<span class="n" id="n-novedades">0</span></button>
+      <button class="tab" role="tab" data-tab="alertas">Alertas<span class="n" id="n-alertas">0</span></button>
+    </div>
+    <div class="cabecera">
+      <p id="descTab"></p>
+      <button class="btn amarillo" id="bNuevo" type="button">+ Nuevo</button>
+    </div>
+    <div class="lista" id="lista" aria-live="polite"></div>
+  </main>
+</div>
+
+<!-- ============ FORMULARIO ============ -->
+<dialog id="dlg" aria-labelledby="dlgTitulo">
+  <div class="dlg-cab"><h2 id="dlgTitulo"></h2><button type="button" id="dlgX" aria-label="Cerrar">×</button></div>
+  <form class="cuerpo" id="form" novalidate>
+    <div id="camposTipo"></div>
+    <p class="error" id="formError" role="alert" hidden></p>
+    <div class="pie-form">
+      <button type="button" class="btn borde" id="bCancelar">Cancelar</button>
+      <button class="btn amarillo" id="bGuardar">Guardar y publicar</button>
+    </div>
+  </form>
+</dialog>
+<div id="toast" hidden role="status"></div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  function el(tag, clase, texto) { var e = document.createElement(tag); if (clase) e.className = clase; if (texto != null && texto !== "") e.textContent = texto; return e; }
+
+  /* ---------- Comunicación con el servidor ---------- */
+  function api(metodo, url, cuerpo) {
+    var o = { method: metodo, credentials: "same-origin", headers: { "X-Requested-With": "cf" } };
+    if (cuerpo !== undefined) { o.headers["Content-Type"] = "application/json"; o.body = JSON.stringify(cuerpo); }
+    return fetch(url, o).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (r.status === 401 && url.indexOf("/login") < 0) { mostrarLogin(); throw new Error("Tu sesión terminó. Entra de nuevo."); }
+        if (!r.ok) throw new Error(d.error || "Ocurrió un error");
+        return d;
+      });
+    });
+  }
+  var tt;
+  function aviso(msg, mal) {
+    var t = $("#toast"); t.textContent = msg; t.className = mal ? "mal" : ""; t.hidden = false;
+    clearTimeout(tt); tt = setTimeout(function () { t.hidden = true; }, 3500);
+  }
+
+  /* ---------- Sesión ---------- */
+  function mostrarLogin() { $("#vPanel").hidden = true; $("#vLogin").hidden = false; if ($("#dlg").open) $("#dlg").close(); }
+  function mostrarPanel() { $("#vLogin").hidden = true; $("#vPanel").hidden = false; cargar(); }
+  $("#fLogin").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var b = $("#lBtn"), er = $("#loginError"); b.disabled = true; er.hidden = true;
+    api("POST", "/api/admin/login", { usuario: $("#lUser").value.trim(), clave: $("#lPass").value })
+      .then(function () { $("#lPass").value = ""; mostrarPanel(); })
+      .catch(function (x) { er.textContent = x.message; er.hidden = false; })
+      .then(function () { b.disabled = false; });
+  });
+  $("#bSalir").addEventListener("click", function () { api("POST", "/api/admin/logout", {}).then(mostrarLogin); });
+  api("GET", "/api/admin/session").then(mostrarPanel).catch(function () { mostrarLogin(); });
+
+  /* ---------- Definición de cada sección ---------- */
+  var TIPOS = {
+    estados: { uno: "estado", titulo: "Estados", desc: "Fotos o videos cortos (con título y texto) que aparecen en círculos arriba del sitio, como las historias. Por defecto duran 24 horas." },
+    novedades: { uno: "novedad", titulo: "Novedades", desc: "Publicaciones fijas de la sección «Novedades» del sitio. Elige el diseño: imagen a la derecha, a la izquierda, arriba, de fondo y más." },
+    alertas: { uno: "alerta", titulo: "Alertas", desc: "Ventana emergente que ve el visitante apenas entra al sitio. Tiene una X para cerrarla. Las alertas activas se muestran una tras otra." }
+  };
+  var DISENOS = {
+    derecha: { n: "Foto a la derecha", d: '<rect x="4" y="8" width="44" height="6" fill="currentColor"/><rect x="4" y="20" width="44" height="3" opacity=".45" fill="currentColor"/><rect x="4" y="27" width="40" height="3" opacity=".45" fill="currentColor"/><rect x="4" y="34" width="30" height="3" opacity=".45" fill="currentColor"/><rect x="56" y="6" width="44" height="40" fill="currentColor" opacity=".8"/>' },
+    izquierda: { n: "Foto a la izquierda", d: '<rect x="4" y="6" width="44" height="40" fill="currentColor" opacity=".8"/><rect x="56" y="8" width="44" height="6" fill="currentColor"/><rect x="56" y="20" width="44" height="3" opacity=".45" fill="currentColor"/><rect x="56" y="27" width="40" height="3" opacity=".45" fill="currentColor"/><rect x="56" y="34" width="30" height="3" opacity=".45" fill="currentColor"/>' },
+    arriba: { n: "Foto grande arriba", d: '<rect x="4" y="3" width="96" height="30" fill="currentColor" opacity=".8"/><rect x="26" y="37" width="52" height="5" fill="currentColor"/><rect x="18" y="45" width="68" height="3" opacity=".45" fill="currentColor"/>' },
+    fondo: { n: "Foto de fondo con texto", d: '<rect x="4" y="3" width="96" height="46" fill="currentColor" opacity=".85"/><rect x="10" y="28" width="50" height="6" fill="#fff"/><rect x="10" y="38" width="70" height="3" opacity=".7" fill="#fff"/>' },
+    texto: { n: "Solo texto destacado", d: '<rect x="4" y="3" width="96" height="46" fill="currentColor" opacity=".18"/><rect x="4" y="3" width="5" height="46" fill="#F2B93B"/><rect x="16" y="14" width="60" height="6" fill="currentColor"/><rect x="16" y="26" width="76" height="3" opacity=".45" fill="currentColor"/><rect x="16" y="33" width="64" height="3" opacity=".45" fill="currentColor"/>' },
+    tarjeta: { n: "Tarjetas (en cuadrícula)", d: '<rect x="3" y="6" width="30" height="40" fill="currentColor" opacity=".18"/><rect x="3" y="6" width="30" height="20" fill="currentColor" opacity=".8"/><rect x="37" y="6" width="30" height="40" fill="currentColor" opacity=".18"/><rect x="37" y="6" width="30" height="20" fill="currentColor" opacity=".8"/><rect x="71" y="6" width="30" height="40" fill="currentColor" opacity=".18"/><rect x="71" y="6" width="30" height="20" fill="currentColor" opacity=".8"/>' }
+  };
+  var DURACIONES = { "24h": "24 horas (recomendado)", "3d": "3 días", "7d": "7 días", siempre: "Hasta que yo lo elimine" };
+
+  var datos = { estados: [], novedades: [], alertas: [] }, tab = "estados", editando = null;
+
+  function fecha(iso) {
+    try { return new Intl.DateTimeFormat("es-CO", { timeZone: "America/Bogota", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }).format(new Date(iso)); }
+    catch (e) { return ""; }
+  }
+  function vencido(i) { return i.expiraEn && new Date(i.expiraEn) <= new Date(); }
+
+  /* ---------- Lista ---------- */
+  function cargar() {
+    return api("GET", "/api/admin/data").then(function (d) { datos = d; pintar(); }).catch(function (e) { aviso(e.message, true); });
+  }
+  function pintar() {
+    Object.keys(TIPOS).forEach(function (t) { $("#n-" + t).textContent = datos[t].length; });
+    document.querySelectorAll(".tab").forEach(function (b) { b.setAttribute("aria-selected", b.dataset.tab === tab); });
+    $("#descTab").textContent = TIPOS[tab].desc;
+    $("#bNuevo").textContent = "+ " + (tab === "estados" ? "Nuevo " : "Nueva ") + TIPOS[tab].uno;
+    var cont = $("#lista"); cont.textContent = "";
+    var items = datos[tab];
+    if (!items.length) {
+      cont.appendChild(el("div", "vacio", "Todavía no hay " + TIPOS[tab].titulo.toLowerCase() + ". Toca el botón amarillo de arriba para crear " + (tab === "estados" ? "el primero" : "la primera") + "."));
+      return;
+    }
+    items.forEach(function (it) {
+      var ven = tab === "estados" && vencido(it);
+      var fila = el("div", "item" + (it.activa === false || ven ? " apagado" : ""));
+      var mini = el("div", "mini");
+      if (it.media && it.media.tipo === "imagen") { var im = document.createElement("img"); im.src = it.media.url; im.alt = ""; mini.appendChild(im); }
+      else if (it.media) { var v = document.createElement("video"); v.src = it.media.url + "#t=0.5"; v.muted = true; v.preload = "metadata"; v.playsInline = true; mini.appendChild(v); }
+      else mini.textContent = "Aa";
+      var inf = el("div");
+      inf.appendChild(el("h3", "", it.titulo || (it.texto ? it.texto.slice(0, 60) : "(sin título)")));
+      var meta = el("div", "meta");
+      var est = el("span", "insignia " + (ven ? "off" : it.activa === false ? "off" : "ok"), ven ? "Vencido" : it.activa === false ? "Oculto" : "Publicado");
+      meta.appendChild(est);
+      if (tab === "novedades") meta.appendChild(el("span", "", DISENOS[it.layout] ? DISENOS[it.layout].n : ""));
+      if (tab === "estados") meta.appendChild(el("span", "", it.expiraEn ? (ven ? "Venció " : "Vence ") + fecha(it.expiraEn) : "Sin vencimiento"));
+      if (it.media) meta.appendChild(el("span", "", it.media.tipo === "video" ? "Video" : "Foto"));
+      meta.appendChild(el("span", "", "Creado " + fecha(it.creado)));
+      inf.appendChild(meta);
+      var bt = el("div", "botones");
+      var bE = el("button", "btn chico", "Editar"); bE.type = "button"; bE.addEventListener("click", function () { abrirForm(it); });
+      var bO = el("button", "btn borde chico", it.activa === false ? "Publicar" : "Ocultar"); bO.type = "button";
+      bO.addEventListener("click", function () {
+        var c = Object.assign({}, it, { activa: it.activa === false });
+        api("PUT", "/api/admin/" + tab + "/" + it.id, c).then(function () { aviso(c.activa ? "Publicado" : "Oculto del sitio"); return cargar(); }).catch(function (e) { aviso(e.message, true); });
+      });
+      var bX = el("button", "btn peligro chico", "Eliminar"); bX.type = "button";
+      bX.addEventListener("click", function () {
+        if (!confirm("¿Eliminar este " + TIPOS[tab].uno + " definitivamente? No se puede deshacer.")) return;
+        api("DELETE", "/api/admin/" + tab + "/" + it.id).then(function () { aviso("Eliminado"); return cargar(); }).catch(function (e) { aviso(e.message, true); });
+      });
+      bt.appendChild(bE); bt.appendChild(bO); bt.appendChild(bX);
+      fila.appendChild(mini); fila.appendChild(inf); fila.appendChild(bt); cont.appendChild(fila);
+    });
+  }
+  document.querySelectorAll(".tab").forEach(function (b) { b.addEventListener("click", function () { tab = b.dataset.tab; pintar(); }); });
+  $("#bNuevo").addEventListener("click", function () { abrirForm(null); });
+
+  /* ---------- Formulario ---------- */
+  var media = null, subiendo = false, xhr = null;
+  var F = {}; // referencias a los campos
+
+  function campo(rotulo, control, ayuda) {
+    var l = el("label", "campo"); l.appendChild(el("span", "", rotulo)); l.appendChild(control);
+    if (ayuda) l.appendChild(el("small", "", ayuda)); return l;
+  }
+  function input(tipo, valor, max, ph) {
+    var i = document.createElement("input"); i.type = tipo; i.value = valor || ""; if (max) i.maxLength = max; if (ph) i.placeholder = ph; return i;
+  }
+
+  function abrirForm(item) {
+    editando = item; media = item && item.media ? item.media : null; subiendo = false;
+    var c = $("#camposTipo"); c.textContent = ""; $("#formError").hidden = true; F = {};
+    $("#dlgTitulo").textContent = (item ? "Editar " : (tab === "estados" ? "Nuevo " : "Nueva ")) + TIPOS[tab].uno;
+    $("#bGuardar").textContent = item ? "Guardar cambios" : "Guardar y publicar";
+
+    if (tab === "novedades") {
+      var caja = el("div", "campo"); caja.appendChild(el("span", "", "Diseño de la publicación"));
+      caja.firstChild.style.cssText = "display:block;font-weight:700;margin-bottom:8px";
+      var g = el("div", "disenos");
+      Object.keys(DISENOS).forEach(function (k) {
+        var l = el("label", "diseno"), r = document.createElement("input");
+        r.type = "radio"; r.name = "layout"; r.value = k; r.checked = (item ? item.layout : "derecha") === k;
+        l.appendChild(r);
+        var s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 104 52"); s.setAttribute("aria-hidden", "true"); s.innerHTML = DISENOS[k].d;
+        l.appendChild(s); l.appendChild(document.createTextNode(DISENOS[k].n)); g.appendChild(l);
+      });
+      caja.appendChild(g); c.appendChild(caja);
+    }
+
+    F.titulo = input("text", item && item.titulo, 120, tab === "novedades" ? "Título grande de la novedad" : "Título (opcional)");
+    c.appendChild(campo(tab === "novedades" ? "Título" : "Título (opcional)", F.titulo));
+    F.texto = document.createElement("textarea"); F.texto.maxLength = 3000; F.texto.value = (item && item.texto) || "";
+    c.appendChild(campo("Texto (opcional)", F.texto, "Los saltos de línea se respetan."));
+
+    // Foto o video
+    var sub = el("div", "campo"); sub.appendChild(el("span", "", "Foto o video"));
+    sub.firstChild.style.cssText = "display:block;font-weight:700;margin-bottom:5px";
+    var caj = el("div", "subir"), prev = el("div", "prev"), fila = el("div", "fila");
+    var file = document.createElement("input"); file.type = "file"; file.id = "archivo"; file.accept = "image/*,video/mp4,video/webm,video/quicktime";
+    var lab = el("label", "btn borde chico", "Elegir archivo"); lab.setAttribute("for", "archivo"); lab.tabIndex = 0;
+    lab.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); file.click(); } });
+    var quitar = el("button", "btn peligro chico", "Quitar"); quitar.type = "button";
+    var estado = el("span", ""); estado.style.cssText = "font-size:.9rem;color:var(--texto-suave)";
+    var barra = el("div", "progreso"); barra.hidden = true; barra.appendChild(el("i"));
+    fila.appendChild(file); fila.appendChild(lab); fila.appendChild(quitar); fila.appendChild(estado);
+    caj.appendChild(prev); caj.appendChild(fila); caj.appendChild(barra); sub.appendChild(caj);
+    sub.appendChild(el("small", "", "Fotos JPG, PNG, WEBP o GIF. Videos MP4, WEBM o MOV (hasta 150 MB). Para estados se ve mejor en vertical."));
+    sub.lastChild.style.cssText = "display:block;color:var(--texto-suave);margin-top:4px";
+    c.appendChild(sub);
+
+    function pintarPrev() {
+      prev.textContent = ""; prev.hidden = !media; quitar.hidden = !media;
+      lab.textContent = media ? "Cambiar archivo" : "Elegir archivo";
+      if (!media) return;
+      var m = media.tipo === "video" ? document.createElement("video") : document.createElement("img");
+      m.src = media.url; if (media.tipo === "video") { m.controls = true; m.muted = true; m.playsInline = true; } else m.alt = "Vista previa";
+      prev.appendChild(m);
+    }
+    pintarPrev();
+    quitar.addEventListener("click", function () { media = null; pintarPrev(); estado.textContent = ""; });
+    file.addEventListener("change", function () {
+      var f = file.files[0]; if (!f) return;
+      subiendo = true; $("#bGuardar").disabled = true; barra.hidden = false; barra.firstChild.style.width = "0"; estado.textContent = "Preparando…";
+      reducir(f).then(function (blob) {
+        estado.textContent = "Subiendo…";
+        return subir(blob, f.name, function (p) { barra.firstChild.style.width = p + "%"; estado.textContent = "Subiendo… " + Math.round(p) + "%"; });
+      }).then(function (r) { media = r; estado.textContent = "Listo ✓"; pintarPrev(); })
+        .catch(function (e) { estado.textContent = ""; aviso(e.message, true); })
+        .then(function () { subiendo = false; $("#bGuardar").disabled = false; barra.hidden = true; file.value = ""; });
+    });
+
+    if (tab === "novedades") {
+      var b2 = el("div", "fila2");
+      F.btxt = input("text", item && item.boton && item.boton.texto, 40, "Ej: Ver más");
+      F.burl = input("text", item && item.boton && item.boton.url, 300, "https://wa.me/573112005208");
+      b2.appendChild(campo("Botón (opcional): texto", F.btxt)); b2.appendChild(campo("Botón: enlace", F.burl));
+      c.appendChild(b2);
+    }
+    if (tab === "estados") {
+      F.dur = document.createElement("select");
+      Object.keys(DURACIONES).forEach(function (k) { var o = el("option", "", DURACIONES[k]); o.value = k; if ((item && item.duracion || "24h") === k) o.selected = true; F.dur.appendChild(o); });
+      c.appendChild(campo("¿Cuánto tiempo se muestra?", F.dur, item ? "Al guardar, el tiempo se cuenta de nuevo desde este momento." : ""));
+    }
+    var sw = el("label", "interruptor"); F.activa = document.createElement("input"); F.activa.type = "checkbox"; F.activa.checked = item ? item.activa !== false : true;
+    sw.appendChild(F.activa); sw.appendChild(document.createTextNode(tab === "alertas" ? "Alerta activa (se muestra a los visitantes)" : "Visible en el sitio"));
+    c.appendChild(sw);
+    if (tab === "alertas") c.appendChild(el("div", "aviso", "La alerta aparece al entrar al sitio. Si el visitante la cierra con la X, no vuelve a salir hasta su próxima visita."));
+
+    $("#dlg").showModal(); F.titulo.focus();
+  }
+
+  // Reduce fotos JPEG muy grandes para que el sitio cargue rápido
+  function reducir(f) {
+    if (f.type !== "image/jpeg" || f.size < 1.2 * 1024 * 1024 || !window.createImageBitmap) return Promise.resolve(f);
+    return createImageBitmap(f).then(function (bm) {
+      var max = 1920, k = Math.min(1, max / Math.max(bm.width, bm.height));
+      var cv = document.createElement("canvas"); cv.width = Math.round(bm.width * k); cv.height = Math.round(bm.height * k);
+      cv.getContext("2d").drawImage(bm, 0, 0, cv.width, cv.height);
+      return new Promise(function (ok) { cv.toBlob(function (b) { ok(b && b.size < f.size ? b : f); }, "image/jpeg", 0.86); });
+    }).catch(function () { return f; });
+  }
+  function subir(blob, nombre, progreso) {
+    return new Promise(function (ok, mal) {
+      xhr = new XMLHttpRequest();
+      xhr.open("PUT", "/api/admin/upload?name=" + encodeURIComponent(nombre));
+      xhr.setRequestHeader("X-Requested-With", "cf");
+      xhr.upload.onprogress = function (e) { if (e.lengthComputable) progreso(e.loaded / e.total * 100); };
+      xhr.onload = function () {
+        var d = {}; try { d = JSON.parse(xhr.responseText); } catch (e) {}
+        if (xhr.status === 401) { mostrarLogin(); return mal(new Error("Tu sesión terminó. Entra de nuevo.")); }
+        xhr.status === 200 ? ok(d) : mal(new Error(d.error || "No se pudo subir el archivo."));
+      };
+      xhr.onerror = function () { mal(new Error("Se cortó la conexión al subir el archivo.")); };
+      xhr.send(blob);
+    });
+  }
+
+  $("#form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (subiendo) return;
+    var er = $("#formError"); er.hidden = true;
+    var cuerpo = { titulo: F.titulo.value.trim(), texto: F.texto.value.trim(), media: media, activa: F.activa.checked };
+    if (tab === "novedades") {
+      cuerpo.layout = ($("input[name=layout]:checked") || {}).value || "derecha";
+      cuerpo.boton = { texto: F.btxt.value.trim(), url: F.burl.value.trim() };
+      if (!cuerpo.titulo) return fallo("Escribe el título de la novedad.");
+      if (cuerpo.layout === "fondo" && !media) return fallo("El diseño con foto de fondo necesita una foto o un video.");
+      if ((F.btxt.value.trim() && !F.burl.value.trim()) || (!F.btxt.value.trim() && F.burl.value.trim())) return fallo("Para el botón escribe el texto y el enlace (o deja los dos vacíos).");
+    }
+    if (tab === "estados") cuerpo.duracion = F.dur.value;
+    if (!cuerpo.titulo && !cuerpo.texto && !media) return fallo("Agrega al menos un título, un texto o una foto/video.");
+    function fallo(m) { er.textContent = m; er.hidden = false; }
+    var b = $("#bGuardar"); b.disabled = true;
+    var p = editando ? api("PUT", "/api/admin/" + tab + "/" + editando.id, cuerpo) : api("POST", "/api/admin/" + tab, cuerpo);
+    p.then(function () { $("#dlg").close(); aviso(editando ? "Cambios guardados" : "Publicado en el sitio"); return cargar(); })
+      .catch(function (x) { fallo(x.message); })
+      .then(function () { b.disabled = false; });
+  });
+  function cerrarForm() { if (xhr && subiendo) xhr.abort(); $("#dlg").close(); }
+  $("#dlgX").addEventListener("click", cerrarForm);
+  $("#bCancelar").addEventListener("click", cerrarForm);
+})();
+</script>
+</body>
+</html>
